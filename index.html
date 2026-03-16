@@ -4,19 +4,22 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>שחמט P2P דרמטי ♟️</title>
-    <link rel="stylesheet" href="style.css?v=3">
+    <link rel="stylesheet" href="style.css?v=4">
     <link rel="stylesheet" href="https://unpkg.com/@chrisoakman/chessboardjs@1.0.0/dist/chessboard-1.0.0.min.css">
-    <!-- ספריית קונפטי קלה שעוברת סינונים -->
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 </head>
 <body>
-    <!-- המסך מהבהב באדום כשיש שח -->
     <div id="danger-overlay"></div> 
 
     <div id="app">
         <h1 class="glow-text">שחמט אונליין ⚡</h1>
         
+        <!-- מסך ראשי -->
         <div id="menu">
+            <div id="personal-stats" class="stats-box">
+                📊 הסטטיסטיקה שלך: ניצחונות <span id="stat-w" class="win-text">0</span> | הפסדים <span id="stat-l" class="loss-text">0</span> | תיקו <span id="stat-d">0</span>
+            </div>
+
             <button id="create-btn" class="neon-btn">⚔️ צור משחק קרב חדש</button>
             
             <div class="save-section">
@@ -37,17 +40,34 @@
             </div>
         </div>
 
+        <!-- מסך משחק -->
         <div id="game-container" style="display:none;">
             <div id="status-box">
                 <h3 id="status">מתחבר...</h3>
             </div>
-            <!-- הוספנו wrapper ללוח כדי להרעיד אותו -->
-            <div id="board-wrapper">
-                <div id="board" style="width: 100%; max-width: 450px; margin: auto;"></div>
-            </div>
-            <div class="controls">
-                <button id="restart-btn" class="neon-btn red" style="display:none;">בקש משחק חדש</button>
-                <button id="save-btn" class="neon-btn orange">💾 שמור משחק</button>
+            
+            <div class="game-layout">
+                <!-- הלוח -->
+                <div id="board-wrapper">
+                    <div id="board"></div>
+                    <div class="controls">
+                        <button id="restart-btn" class="neon-btn red" style="display:none;">בקש משחק חדש</button>
+                        <button id="save-btn" class="neon-btn orange">💾 שמור משחק</button>
+                    </div>
+                </div>
+
+                <!-- צדדים (צ'אט והיסטוריה) -->
+                <div class="side-panel">
+                    <div id="move-history" dir="ltr"></div>
+                    
+                    <div id="chat-box">
+                        <div id="chat-messages"></div>
+                        <div class="chat-input-area">
+                            <input type="text" id="chat-input" placeholder="כתוב הודעה ליריב...">
+                            <button id="send-chat-btn">שלח</button>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -58,6 +78,6 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js"></script>
     <script src="https://unpkg.com/peerjs@1.4.7/dist/peerjs.min.js"></script>
     
-    <script src="app.js?v=3"></script>
+    <script src="app.js?v=4"></script>
 </body>
 </html>
