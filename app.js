@@ -170,7 +170,7 @@ function initChessboard() {
         draggable: true,
         position: isStartPos ? 'start' : currentFen,
         orientation: playerColor === 'w' ? 'white' : 'black',
-        pieceTheme: 'img/chesspieces/wikipedia/{piece}.png', // נשאר מקומי כדי לעקוף אתרוג!
+        pieceTheme: 'https://raw.githubusercontent.com/oakmac/chessboardjs/master/website/img/chesspieces/wikipedia/{piece}.png',
         moveSpeed: 'slow', // תזוזה דרמטית
         onDragStart: onDragStart,
         onDrop: onDrop,
