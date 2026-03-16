@@ -1,60 +1,168 @@
+/* אנימציית רקע דרמטית */
+@keyframes bg-pan {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: #2b2b2b;
-    color: #ffffff;
+    margin: 0;
+    min-height: 100vh;
     display: flex;
     justify-content: center;
     align-items: center;
-    min-height: 100vh;
-    margin: 0;
     text-align: center;
+    background: linear-gradient(-45deg, #1a1a2e, #16213e, #0f3460, #1a1a2e);
+    background-size: 400% 400%;
+    animation: bg-pan 15s ease infinite;
+    color: #fff;
+    overflow-x: hidden;
 }
 
 #app {
-    background-color: #3b3b3b;
+    background: rgba(20, 20, 30, 0.85);
+    backdrop-filter: blur(10px);
     padding: 30px;
-    border-radius: 12px;
-    box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+    border-radius: 20px;
+    box-shadow: 0 0 30px rgba(0, 255, 255, 0.2), inset 0 0 20px rgba(0, 0, 0, 0.8);
     width: 90%;
     max-width: 500px;
+    border: 1px solid rgba(255,255,255,0.1);
+    z-index: 10;
 }
 
-button {
-    background-color: #4CAF50;
-    color: white;
-    border: none;
+.glow-text {
+    text-shadow: 0 0 10px #0ff, 0 0 20px #0ff;
+    letter-spacing: 2px;
+}
+
+/* כפתורי נאון */
+.neon-btn {
+    background: transparent;
+    color: #fff;
+    border: 2px solid #0ff;
     padding: 12px 24px;
     font-size: 16px;
-    border-radius: 6px;
+    font-weight: bold;
+    border-radius: 8px;
     cursor: pointer;
     transition: 0.3s;
-    margin: 10px 0;
+    text-transform: uppercase;
+    box-shadow: 0 0 10px rgba(0, 255, 255, 0.3) inset;
+    width: 100%;
+    margin-top: 15px;
 }
 
-button:hover { background-color: #45a049; }
+.neon-btn:hover {
+    background: #0ff;
+    color: #000;
+    box-shadow: 0 0 20px #0ff;
+    transform: scale(1.05);
+}
 
-input {
+.neon-btn.blue { border-color: #3a86ff; box-shadow: 0 0 10px rgba(58, 134, 255, 0.3) inset; }
+.neon-btn.blue:hover { background: #3a86ff; box-shadow: 0 0 20px #3a86ff; }
+
+.neon-btn.green { border-color: #00f5d4; box-shadow: 0 0 10px rgba(0, 245, 212, 0.3) inset; }
+.neon-btn.green:hover { background: #00f5d4; box-shadow: 0 0 20px #00f5d4; }
+
+.neon-btn.red { border-color: #ff0054; box-shadow: 0 0 10px rgba(255, 0, 84, 0.3) inset; }
+.neon-btn.red:hover { background: #ff0054; box-shadow: 0 0 20px #ff0054; color: #fff; }
+
+.neon-btn.orange { border-color: #fb8500; box-shadow: 0 0 10px rgba(251, 133, 0, 0.3) inset; margin-top: 10px;}
+.neon-btn.orange:hover { background: #fb8500; box-shadow: 0 0 20px #fb8500; }
+
+input, select {
     width: 100%;
-    padding: 10px;
-    margin-bottom: 10px;
-    border-radius: 4px;
-    border: 1px solid #ccc;
+    padding: 12px;
+    margin-top: 10px;
+    border-radius: 6px;
+    border: none;
+    background: rgba(255,255,255,0.1);
+    color: #fff;
     box-sizing: border-box;
-    font-size: 14px;
+    font-size: 16px;
+    outline: none;
+    transition: 0.3s;
+}
+
+input:focus, select:focus {
+    background: rgba(255,255,255,0.2);
+    box-shadow: 0 0 10px #0ff;
+}
+
+select option { background: #1a1a2e; color: #fff; }
+
+.save-section {
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 1px solid rgba(255,255,255,0.1);
 }
 
 #status-box {
-    background: #444;
-    padding: 10px;
-    border-radius: 6px;
-    margin-bottom: 15px;
+    background: rgba(0,0,0,0.5);
+    padding: 15px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    border: 1px solid rgba(255,255,255,0.1);
+    font-size: 1.2rem;
+    font-weight: bold;
 }
 
-.pulsate {
-    animation: pulsate 1.5s infinite alternate;
-    color: #ffcc00;
+.pulsate { animation: pulsate 1.5s infinite alternate; color: #ff0054; font-weight: bold;}
+@keyframes pulsate { 100% { opacity: 0.5; transform: scale(0.95); } }
+
+/* --- אנימציות המשחק --- */
+
+/* רעידת מסך כשכלי נאכל */
+@keyframes shake {
+    0% { transform: translate(1px, 1px) rotate(0deg); }
+    10% { transform: translate(-1px, -2px) rotate(-1deg); }
+    20% { transform: translate(-3px, 0px) rotate(1deg); }
+    30% { transform: translate(3px, 2px) rotate(0deg); }
+    40% { transform: translate(1px, -1px) rotate(1deg); }
+    50% { transform: translate(-1px, 2px) rotate(-1deg); }
+    60% { transform: translate(-3px, 1px) rotate(0deg); }
+    70% { transform: translate(3px, 1px) rotate(-1deg); }
+    80% { transform: translate(-1px, -1px) rotate(1deg); }
+    90% { transform: translate(1px, 2px) rotate(0deg); }
+    100% { transform: translate(1px, -2px) rotate(-1deg); }
 }
 
-@keyframes pulsate {
-    100% { opacity: 0.5; }
+.shake-effect {
+    animation: shake 0.4s;
+}
+
+/* מסך אדום מאיים בשח */
+#danger-overlay {
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: radial-gradient(circle, transparent 50%, rgba(255, 0, 0, 0.4) 100%);
+    pointer-events: none;
+    opacity: 0;
+    transition: 0.5s;
+    z-index: 1;
+}
+
+.in-check #danger-overlay {
+    opacity: 1;
+    animation: flash-red 2s infinite alternate;
+}
+
+@keyframes flash-red {
+    0% { opacity: 0.3; }
+    100% { opacity: 0.8; }
+}
+
+/* סימון משבצת של המהלך האחרון */
+.highlight-square {
+    box-shadow: inset 0 0 15px 5px rgba(255, 255, 0, 0.7) !important;
+}
+
+/* שיפור מראה הלוח */
+#board {
+    border: 4px solid #333;
+    border-radius: 4px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.8);
 }
