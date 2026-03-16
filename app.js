@@ -11,7 +11,27 @@ const gameContainerEl = document.getElementById('game-container');
 const inviteContainerEl = document.getElementById('invite-container');
 const inviteLinkEl = document.getElementById('invite-link');
 const statusEl = document.getElementById('status');
+// --- אתחול (בדיקה האם אנחנו יוצרים או מצטרפים) ---
+const hash = window.location.hash.substring(1); 
 
+// פונקציית עזר לחילוץ נתונים מה-URL (לדוגמה: #ROOMID?fen=...&color=b)
+let roomHash = hash.split('?')[0];
+let urlParams = new URLSearchParams(hash.substring(roomHash.length + 1));
+let loadedFen = urlParams.get('fen');
+let opponentColor = urlParams.get('color');
+
+if (roomHash) {
+    // שחקן ב' מצטרף
+    playerColor = opponentColor || 'b'; // אם לא הוגדר צבע בקישור, הוא שחור
+    if (loadedFen) {
+        game.load(decodeURIComponent(loadedFen)); // טעינת המצב מהקישור
+    }
+    initJoiner(roomHash);
+} else {
+    // שחקן א' במסך הראשי
+    document.getElementById('create-btn').addEventListener('click', () => initCreator());
+    document.getElementById('resume-btn').addEventListener('click', resumeGame);
+}
 // --- אתחול (בדיקה האם אנחנו יוצרים או מצטרפים) ---
 const roomHash = window.location.hash.substring(1); // מזהה החדר מה-URL
 if (roomHash) {
