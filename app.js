@@ -194,7 +194,7 @@ function initChessboard() {
         draggable: true,
         position: isStartPos ? 'start' : currentFen,
         orientation: playerColor === 'w' ? 'white' : 'black',
-        pieceTheme: 'img/chesspieces/wikipedia/{piece}.png', 
+        pieceTheme: 'https://raw.githubusercontent.com/oakmac/chessboardjs/master/website/img/chesspieces/wikipedia/{piece}.png', 
         moveSpeed: 'slow', 
         onDragStart: onDragStart,
         onDrop: onDrop,
