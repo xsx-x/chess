@@ -45,26 +45,32 @@ if (roomHash) {
 
 // --- פונקציות WebRTC ---
 
-function initCreator() {
-    document.getElementById('create-btn').style.display = 'none';
-    
-    // יוצר מזהה אקראי למשחק
+function initCreator(startingFen = null, myColor = 'w') {
+    document.getElementById('menu').children[0].style.display = 'none'; // הסתרת כפתורים
+    document.getElementById('menu').children[1].style.display = 'none'; 
+    playerColor = myColor; // קביעת הצבע של שחקן א'
+
     const gameId = Math.random().toString(36).substring(2, 8);
-    peer = new Peer(gameId); // יצירת Peer
+    peer = new Peer(gameId);
     
     peer.on('open', (id) => {
-        const link = window.location.href.split('#')[0] + '#' + id;
+        let link = window.location.href.split('#')[0] + '#' + id;
+        
+        // אם זה משחק משוחזר, נוסיף את הנתונים לקישור של היריב
+        if (startingFen) {
+            const oppColor = myColor === 'w' ? 'b' : 'w';
+            link += `?fen=${encodeURIComponent(startingFen)}&color=${oppColor}`;
+        }
+        
         inviteLinkEl.value = link;
         inviteContainerEl.style.display = 'block';
     });
 
-    // המתנה לחיבור משחקן ב'
     peer.on('connection', (connection) => {
         conn = connection;
         setupConnection();
     });
 }
-
 function initJoiner(hostId) {
     menuEl.style.display = 'none';
     gameContainerEl.style.display = 'block';
@@ -203,4 +209,38 @@ document.getElementById('restart-btn').addEventListener('click', () => {
     board.start();
     conn.send({ type: 'restart' });
     updateStatus();
+});
+// --- פונקציות שמירה וטעינה (FEN) ---
+
+// שחזור משחק מהמסך הראשי
+function resumeGame() {
+    const fen = document.getElementById('fen-input').value.trim();
+    const selectedColor = document.getElementById('resume-color').value;
+
+    if (!fen) {
+        alert("אנא הדבק קוד משחק (FEN)");
+        return;
+    }
+
+    // בדיקה שהקוד תקין
+    const validation = game.load(fen);
+    if (!validation) {
+        alert("קוד המשחק לא תקין!");
+        return;
+    }
+
+    // אם הקוד תקין, מתחילים כיוצר חדר עם ה-FEN הזה
+    initCreator(fen, selectedColor);
+}
+
+// שמירת משחק (העתקה ללוח)
+document.getElementById('save-btn').addEventListener('click', () => {
+    const fen = game.fen(); // שולף את מצב המשחק הנוכחי
+    navigator.clipboard.writeText(fen).then(() => {
+        const btn = document.getElementById('save-btn');
+        btn.innerText = '✅ הקוד הועתק!';
+        setTimeout(() => { btn.innerText = '💾 שמור משחק (העתק קוד)'; }, 3000);
+    }).catch(err => {
+        alert("שגיאה בהעתקה: " + fen);
+    });
 });
