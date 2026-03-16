@@ -4,8 +4,10 @@ let game = new Chess();
 let peer = null;
 let conn = null;
 let playerColor = 'w';
+let stats = { w: 0, l: 0, d: 0 }; // סטטיסטיקה
+let gameEnded = false;
 
-// --- מנוע סאונד עצמאי לחלוטין (ללא קבצים!) ---
+// --- מנוע סאונד עצמאי ---
 const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 function playSound(type) {
     if (audioCtx.state === 'suspended') audioCtx.resume();
@@ -15,28 +17,31 @@ function playSound(type) {
     gainNode.connect(audioCtx.destination);
 
     if (type === 'move') {
-        osc.type = 'sine';
-        osc.frequency.setValueAtTime(400, audioCtx.currentTime);
+        osc.type = 'sine'; osc.frequency.setValueAtTime(400, audioCtx.currentTime);
         osc.frequency.exponentialRampToValueAtTime(600, audioCtx.currentTime + 0.1);
         gainNode.gain.setValueAtTime(0.5, audioCtx.currentTime);
         gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
         osc.start(); osc.stop(audioCtx.currentTime + 0.1);
     } 
     else if (type === 'capture') {
-        osc.type = 'sawtooth';
-        osc.frequency.setValueAtTime(150, audioCtx.currentTime);
+        osc.type = 'sawtooth'; osc.frequency.setValueAtTime(150, audioCtx.currentTime);
         osc.frequency.exponentialRampToValueAtTime(50, audioCtx.currentTime + 0.2);
         gainNode.gain.setValueAtTime(1, audioCtx.currentTime);
         gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.2);
         osc.start(); osc.stop(audioCtx.currentTime + 0.2);
     }
     else if (type === 'check') {
-        osc.type = 'square';
-        osc.frequency.setValueAtTime(300, audioCtx.currentTime);
+        osc.type = 'square'; osc.frequency.setValueAtTime(300, audioCtx.currentTime);
         osc.frequency.setValueAtTime(400, audioCtx.currentTime + 0.2);
         gainNode.gain.setValueAtTime(0.5, audioCtx.currentTime);
         gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.6);
         osc.start(); osc.stop(audioCtx.currentTime + 0.6);
+    }
+    else if (type === 'chat') { // צליל הודעה חדשה
+        osc.type = 'sine'; osc.frequency.setValueAtTime(800, audioCtx.currentTime);
+        gainNode.gain.setValueAtTime(0.3, audioCtx.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
+        osc.start(); osc.stop(audioCtx.currentTime + 0.1);
     }
 }
 
@@ -44,20 +49,35 @@ function playSound(type) {
 function triggerCaptureAnimation() {
     const wrapper = document.getElementById('board-wrapper');
     wrapper.classList.remove('shake-effect');
-    void wrapper.offsetWidth; // טריק לאיפוס האנימציה
+    void wrapper.offsetWidth; 
     wrapper.classList.add('shake-effect');
 }
 
 function highlightMove(source, target) {
-    $('.square-55d63').removeClass('highlight-square'); // מחיקת סימונים קודמים
+    $('.square-55d63').removeClass('highlight-square'); 
     $('.square-' + source).addClass('highlight-square');
     $('.square-' + target).addClass('highlight-square');
 }
 
+// --- טעינת סטטיסטיקה אישית ---
+function loadStats() {
+    const saved = localStorage.getItem('chessStats');
+    if (saved) stats = JSON.parse(saved);
+    document.getElementById('stat-w').innerText = stats.w;
+    document.getElementById('stat-l').innerText = stats.l;
+    document.getElementById('stat-d').innerText = stats.d;
+}
+
+function saveStats(result) {
+    if (gameEnded) return; // מונע ספירה כפולה
+    stats[result]++;
+    localStorage.setItem('chessStats', JSON.stringify(stats));
+    gameEnded = true;
+}
 
 // --- אתחול ---
 window.onload = () => {
-    // אתחול סאונד בלחיצה ראשונה במסך (מדיניות דפדפנים)
+    loadStats(); // טעינת נתונים
     document.body.addEventListener('click', () => {
         if (audioCtx.state === 'suspended') audioCtx.resume();
     }, { once: true });
@@ -97,7 +117,6 @@ function initCreator(startingFen = null, myColor = 'w') {
             const oppColor = myColor === 'w' ? 'b' : 'w';
             link += `?fen=${encodeURIComponent(startingFen)}&color=${oppColor}`;
         }
-        
         document.getElementById('invite-link').value = link;
         document.getElementById('invite-container').style.display = 'block';
     });
@@ -132,6 +151,7 @@ function setupConnection() {
         document.getElementById('game-container').style.display = 'block';
         initChessboard();
         updateStatus();
+        appendChatMessage("מערכת", "החיבור נוצר! המשחק התחיל. ⚔️");
     });
 
     conn.on('data', (data) => {
@@ -139,25 +159,29 @@ function setupConnection() {
             const moveResult = game.move({ from: data.from, to: data.to, promotion: 'q' });
             board.position(game.fen());
             
-            // הפעלת דרמה אצל השחקן המקבל
             highlightMove(data.from, data.to);
             if (moveResult && moveResult.captured) {
-                playSound('capture');
-                triggerCaptureAnimation();
+                playSound('capture'); triggerCaptureAnimation();
             } else {
                 playSound('move');
             }
             updateStatus();
-        } else if (data.type === 'restart') {
-            game.reset();
-            board.start();
+        } 
+        else if (data.type === 'restart') {
+            game.reset(); board.start(); gameEnded = false;
             $('.square-55d63').removeClass('highlight-square');
             updateStatus();
+            appendChatMessage("מערכת", "היריב התחיל משחק חדש!");
+        }
+        else if (data.type === 'chat') {
+            playSound('chat');
+            appendChatMessage("יריב", data.text, false);
         }
     });
 
     conn.on('close', () => {
         document.getElementById('status').innerText = "היריב ברח מהמערכה! 🏳️";
+        appendChatMessage("מערכת", "היריב התנתק.");
     });
 }
 
@@ -170,79 +194,70 @@ function initChessboard() {
         draggable: true,
         position: isStartPos ? 'start' : currentFen,
         orientation: playerColor === 'w' ? 'white' : 'black',
-        pieceTheme: 'https://raw.githubusercontent.com/oakmac/chessboardjs/master/website/img/chesspieces/wikipedia/{piece}.png',
-        moveSpeed: 'slow', // תזוזה דרמטית
+        pieceTheme: 'img/chesspieces/wikipedia/{piece}.png', 
+        moveSpeed: 'slow', 
         onDragStart: onDragStart,
         onDrop: onDrop,
         onSnapEnd: onSnapEnd
     };
-    
     board = Chessboard('board', config);
 }
 
 function onDragStart(source, piece, position, orientation) {
     if (game.game_over()) return false;
     if ((playerColor === 'w' && piece.search(/^b/) !== -1) ||
-        (playerColor === 'b' && piece.search(/^w/) !== -1)) {
-        return false;
-    }
+        (playerColor === 'b' && piece.search(/^w/) !== -1)) return false;
     if ((game.turn() === 'w' && playerColor === 'b') ||
-        (game.turn() === 'b' && playerColor === 'w')) {
-        return false;
-    }
+        (game.turn() === 'b' && playerColor === 'w')) return false;
 }
 
 function onDrop(source, target) {
-    let move = game.move({
-        from: source,
-        to: target,
-        promotion: 'q'
-    });
-
+    let move = game.move({ from: source, to: target, promotion: 'q' });
     if (move === null) return 'snapback';
 
-    // הפעלת אפקטים לשחקן שזז
     highlightMove(source, target);
-    if (move.captured) {
-        playSound('capture');
-        triggerCaptureAnimation();
-    } else {
-        playSound('move');
-    }
+    if (move.captured) { playSound('capture'); triggerCaptureAnimation(); } 
+    else { playSound('move'); }
 
     conn.send({ type: 'move', from: source, to: target });
     updateStatus();
 }
 
-function onSnapEnd() {
-    board.position(game.fen());
-}
+function onSnapEnd() { board.position(game.fen()); }
 
-// --- ניהול תצוגה ומצב ---
+// --- ניהול תצוגה, מצב וסטטיסטיקה ---
 function updateStatus() {
     let statusHTML = '';
     let moveColor = game.turn() === 'w' ? 'לבן' : 'שחור';
     let isMyTurn = game.turn() === playerColor;
 
-    // הסרת מסך שח כברירת מחדל
     document.body.classList.remove('in-check');
 
+    // עדכון היסטוריית מהלכים (PGN)
+    document.getElementById('move-history').innerText = game.pgn() || "עדיין אין מהלכים...";
+    document.getElementById('move-history').scrollTop = document.getElementById('move-history').scrollHeight;
+
     if (game.in_checkmate()) {
-        statusHTML = `🔥 מט! השחקן ה${moveColor === 'לבן' ? 'שחור' : 'לבן'} השמיד את היריב! 🔥`;
+        const iWon = (game.turn() !== playerColor); // אם התור של היריב ויש מט - ניצחתי!
+        statusHTML = iWon ? '🏆 ניצחת! מכת מחץ ליריב!' : '💀 הפסדת... היריב נתן לך מט.';
         document.getElementById('restart-btn').style.display = 'block';
-        if (typeof confetti === 'function') {
-            confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } }); // פיצוץ קונפטי!
+        
+        saveStats(iWon ? 'w' : 'l'); // שמירת ניצחון/הפסד
+        
+        if (iWon && typeof confetti === 'function') {
+            confetti({ particleCount: 200, spread: 90, origin: { y: 0.6 } });
         }
     } 
     else if (game.in_draw()) {
         statusHTML = '⚔️ תיקו! קרב צמוד.';
         document.getElementById('restart-btn').style.display = 'block';
+        saveStats('d'); // שמירת תיקו
     } 
     else {
         statusHTML = isMyTurn ? '🟢 התור שלך לתקוף' : '🔴 ממתין למהלך היריב';
         if (game.in_check()) {
             statusHTML += ' <br> ⚠️ <b>שח! המלך בסכנה!</b> ⚠️';
-            document.body.classList.add('in-check'); // מדליק את האור האדום!
+            document.body.classList.add('in-check');
             playSound('check');
         }
         document.getElementById('restart-btn').style.display = 'none';
@@ -251,14 +266,48 @@ function updateStatus() {
     document.getElementById('status').innerHTML = statusHTML;
 }
 
-// --- פונקציות טעינה ושמירה ---
+// --- מערכת צ'אט ---
+function appendChatMessage(sender, text, isMine = true) {
+    const chatDiv = document.getElementById('chat-messages');
+    const msgEl = document.createElement('div');
+    msgEl.classList.add('chat-msg');
+    
+    if (sender === "מערכת") {
+        msgEl.style.color = "#0ff";
+        msgEl.style.textAlign = "center";
+        msgEl.style.alignSelf = "center";
+        msgEl.style.fontSize = "12px";
+    } else {
+        msgEl.classList.add(isMine ? 'msg-mine' : 'msg-theirs');
+    }
+    
+    msgEl.innerText = text;
+    chatDiv.appendChild(msgEl);
+    chatDiv.scrollTop = chatDiv.scrollHeight; // גלילה למטה
+}
+
+function sendChat() {
+    const input = document.getElementById('chat-input');
+    const text = input.value.trim();
+    if (text && conn) {
+        conn.send({ type: 'chat', text: text });
+        appendChatMessage("אני", text, true);
+        input.value = '';
+    }
+}
+
+document.getElementById('send-chat-btn').addEventListener('click', sendChat);
+document.getElementById('chat-input').addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') sendChat();
+});
+
+
+// --- פונקציות עזר (שחזור ושמירה) ---
 function resumeGame() {
     const fen = document.getElementById('fen-input').value.trim();
     const selectedColor = document.getElementById('resume-color').value;
-
     if (!fen) { alert("אנא הדבק קוד משחק (FEN)"); return; }
     if (!game.load(fen)) { alert("קוד המשחק לא תקין!"); return; }
-
     initCreator(fen, selectedColor);
 }
 
@@ -269,11 +318,11 @@ document.getElementById('copy-btn').addEventListener('click', () => {
 });
 
 document.getElementById('restart-btn').addEventListener('click', () => {
-    game.reset();
-    board.start();
+    game.reset(); board.start(); gameEnded = false;
     $('.square-55d63').removeClass('highlight-square');
     conn.send({ type: 'restart' });
     updateStatus();
+    appendChatMessage("מערכת", "התחלת משחק חדש!");
 });
 
 document.getElementById('save-btn').addEventListener('click', () => {
