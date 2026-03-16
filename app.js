@@ -89,12 +89,18 @@ function setupConnection() {
 function initChessboard() {
     const config = {
         draggable: true,
-        position: 'start',
+        // אם יש מצב שמור נטען אותו, אחרת נתחיל מחדש
+        position: game.fen() === 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1' ? 'start' : game.fen(),
         orientation: playerColor === 'w' ? 'white' : 'black',
+        
+        // --- הפתרון לבעיית התמונות: משיכת הכלים משרת חיצוני ---
+        pieceTheme: 'https://chessboardjs.com/img/chesspieces/wikipedia/{piece}.png',
+        
         onDragStart: onDragStart,
         onDrop: onDrop,
         onSnapEnd: onSnapEnd
     };
+    
     board = Chessboard('board', config);
 }
 
