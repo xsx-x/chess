@@ -3,44 +3,52 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>שחמט P2P - WebRTC</title>
-    <link rel="stylesheet" href="style.css">
+    <title>שחמט P2P דרמטי ♟️</title>
+    <link rel="stylesheet" href="style.css?v=3">
     <link rel="stylesheet" href="https://unpkg.com/@chrisoakman/chessboardjs@1.0.0/dist/chessboard-1.0.0.min.css">
+    <!-- ספריית קונפטי קלה שעוברת סינונים -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 </head>
 <body>
+    <!-- המסך מהבהב באדום כשיש שח -->
+    <div id="danger-overlay"></div> 
+
     <div id="app">
-        <h1>שחמט P2P ♟️</h1>
+        <h1 class="glow-text">שחמט אונליין ⚡</h1>
         
-        <!-- מסך ראשי: יצירת משחק -->
         <div id="menu">
-    <button id="create-btn">צור משחק חדש</button>
-    
-    <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #555;">
-        <p>יש לך קוד משחק שמור?</p>
-        <input type="text" id="fen-input" placeholder="הדבק כאן את הקוד (FEN)..." dir="ltr">
-        <select id="resume-color" style="padding: 10px; margin-bottom: 10px; width: 100%; border-radius: 4px;">
-            <option value="w">אני משחק בלבן</option>
-            <option value="b">אני משחק בשחור</option>
-        </select>
-        <button id="resume-btn" style="background-color: #2196F3;">שחזר משחק</button>
-    </div>
+            <button id="create-btn" class="neon-btn">⚔️ צור משחק קרב חדש</button>
+            
+            <div class="save-section">
+                <p>יש לך קוד משחק שמור?</p>
+                <input type="text" id="fen-input" placeholder="הדבק כאן את הקוד (FEN)..." dir="ltr">
+                <select id="resume-color">
+                    <option value="w">אני משחק בלבן</option>
+                    <option value="b">אני משחק בשחור</option>
+                </select>
+                <button id="resume-btn" class="neon-btn blue">🔄 שחזר משחק</button>
+            </div>
 
-    <div id="invite-container" style="display:none; margin-top: 20px;">
-        <p>שלח את הקישור הזה ליריב:</p>
-        <input type="text" id="invite-link" readonly dir="ltr">
-        <button id="copy-btn">העתק קישור</button>
-        <p id="waiting-msg" class="pulsate">ממתין להצטרפות היריב...</p>
-    </div>
-</div>
+            <div id="invite-container" style="display:none;">
+                <p>שלח את הקישור הזה ליריב:</p>
+                <input type="text" id="invite-link" readonly dir="ltr">
+                <button id="copy-btn" class="neon-btn green">העתק קישור</button>
+                <p id="waiting-msg" class="pulsate">ממתין שהיריב יאזור אומץ ויכנס...</p>
+            </div>
+        </div>
 
-        <!-- מסך משחק -->
         <div id="game-container" style="display:none;">
             <div id="status-box">
                 <h3 id="status">מתחבר...</h3>
             </div>
-            <div id="board" style="width: 100%; max-width: 400px; margin: auto;"></div>
-            <button id="restart-btn" style="display:none; margin-top: 15px;">בקש משחק חדש</button>
-            <button id="save-btn" style="background-color: #FF9800; margin-top: 10px;">💾 שמור משחק (העתק קוד)</button>
+            <!-- הוספנו wrapper ללוח כדי להרעיד אותו -->
+            <div id="board-wrapper">
+                <div id="board" style="width: 100%; max-width: 450px; margin: auto;"></div>
+            </div>
+            <div class="controls">
+                <button id="restart-btn" class="neon-btn red" style="display:none;">בקש משחק חדש</button>
+                <button id="save-btn" class="neon-btn orange">💾 שמור משחק</button>
+            </div>
         </div>
     </div>
 
@@ -50,7 +58,6 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js"></script>
     <script src="https://unpkg.com/peerjs@1.4.7/dist/peerjs.min.js"></script>
     
-    <!-- הלוגיקה שלנו -->
-    <script src="app.js"></script>
+    <script src="app.js?v=3"></script>
 </body>
 </html>
