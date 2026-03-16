@@ -115,7 +115,7 @@ function initChessboard() {
         orientation: playerColor === 'w' ? 'white' : 'black',
         
         // פתרון משיכת תמונות הכלים משרת חיצוני
-        pieceTheme: 'https://chessboardjs.com/img/chesspieces/wikipedia/{piece}.png',
+        pieceTheme: 'https://raw.githubusercontent.com/oakmac/chessboardjs/master/website/img/chesspieces/wikipedia/{piece}.png',
         
         onDragStart: onDragStart,
         onDrop: onDrop,
