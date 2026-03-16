@@ -166,3 +166,122 @@ select option { background: #1a1a2e; color: #fff; }
     border-radius: 4px;
     box-shadow: 0 10px 30px rgba(0,0,0,0.8);
 }
+/* --- תוספות לגרסה 4 (צ'אט וסטטיסטיקה) --- */
+
+.stats-box {
+    background: rgba(0,0,0,0.6);
+    padding: 10px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    font-size: 14px;
+    border: 1px solid rgba(255,255,255,0.2);
+}
+
+.win-text { color: #00f5d4; font-weight: bold; }
+.loss-text { color: #ff0054; font-weight: bold; }
+
+.game-layout {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: center;
+    align-items: flex-start;
+}
+
+#board-wrapper {
+    flex: 1;
+    min-width: 300px;
+    max-width: 450px;
+}
+
+.side-panel {
+    flex: 1;
+    min-width: 280px;
+    max-width: 350px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+#move-history {
+    background: rgba(0,0,0,0.5);
+    padding: 10px;
+    border-radius: 6px;
+    height: 80px;
+    overflow-y: auto;
+    font-family: monospace;
+    color: #aaa;
+    border: 1px solid #444;
+    text-align: left;
+    font-size: 14px;
+}
+
+#chat-box {
+    background: rgba(0,0,0,0.5);
+    border: 1px solid #444;
+    border-radius: 6px;
+    display: flex;
+    flex-direction: column;
+    height: 250px;
+}
+
+#chat-messages {
+    flex: 1;
+    padding: 10px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    text-align: right;
+}
+
+.chat-msg {
+    padding: 6px 10px;
+    border-radius: 12px;
+    font-size: 14px;
+    max-width: 85%;
+    word-wrap: break-word;
+}
+
+.msg-mine {
+    background: #0f3460;
+    align-self: flex-start;
+    border-bottom-right-radius: 2px;
+}
+
+.msg-theirs {
+    background: #444;
+    align-self: flex-end;
+    border-bottom-left-radius: 2px;
+}
+
+.chat-input-area {
+    display: flex;
+    border-top: 1px solid #444;
+}
+
+.chat-input-area input {
+    margin: 0;
+    border: none;
+    border-radius: 0 0 6px 0;
+    background: transparent;
+}
+
+#send-chat-btn {
+    background: #0ff;
+    color: #000;
+    border: none;
+    padding: 0 15px;
+    cursor: pointer;
+    font-weight: bold;
+    border-radius: 0 0 0 6px;
+    transition: 0.2s;
+}
+
+#send-chat-btn:hover { background: #00cccc; }
+
+/* גלילה יפה לצ'אט */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); }
+::-webkit-scrollbar-thumb { background: #555; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #0ff; }
